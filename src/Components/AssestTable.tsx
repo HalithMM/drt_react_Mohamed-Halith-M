@@ -164,12 +164,12 @@ const AssetTable: React.FC<Props> = ({
 
   return (
     <div className="border rounded shadow-sm overflow-auto">
-      <div className="grid grid-cols-6 bg-gray-200 font-semibold sticky top-0 z-10 text-sm">
+      <div className="grid grid-cols-6 bg-gray-200 font-semibold sticky top-0 z-10 text-sm" style={{ paddingRight: '15px' }}>
         {table.getHeaderGroups().map((headerGroup) =>
           headerGroup.headers.map((header) => (
             <div
               key={header.id}
-              className="border px-2 py-2 truncate whitespace-nowrap"
+              className="border px-2 py-2 truncate text-center whitespace-nowrap"
             >
               {flexRender(header.column.columnDef.header, header.getContext())}
             </div>
@@ -192,7 +192,7 @@ const AssetTable: React.FC<Props> = ({
                 style={{transform: `translateY(${virtualRow.start}px)`,}}
                 >
                 {row.getVisibleCells().map((cell) => (
-                  <div key={cell.id} className="border px-2 py-1 truncate whitespace-nowrap" >
+                  <div key={cell.id} className="border px-2 py-1 truncate text-center whitespace-nowrap" >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </div>
                 ))}
