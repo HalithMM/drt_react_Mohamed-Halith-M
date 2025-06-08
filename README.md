@@ -36,32 +36,4 @@ npm install
 
 # Start development server
 npm run dev
-export default tseslint.config({
-  extends: [
-    // Replace ...tseslint.configs.recommended with:
-    ...tseslint.configs.recommendedTypeChecked,
-    // Optionally stricter and stylistic rules:
-    // ...tseslint.configs.strictTypeChecked,
-    // ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  plugins: {
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+ 
