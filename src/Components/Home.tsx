@@ -1,11 +1,10 @@
-
 import { useEffect, useState } from "react";
 import ObjectTypeCounter from "./ObjectTypeCounter";
 import {
   Autocomplete,
   TextField,
   Badge,
-  CircularProgress, 
+  CircularProgress,
 } from "@mui/material";
 import FilterListAltIcon from "@mui/icons-material/FilterListAlt";
 import { motion } from "framer-motion";
@@ -35,18 +34,62 @@ export const Home = () => {
   const [storageError, setStorageError] = useState<string | null>(null);
 
   const [filterTextInput, setFilterTextInput] = useState("");
-  const [selectedObjectTypesInput, setSelectedObjectTypesInput] = useState<string[]>([]);
-  const [selectedOrbitCodesInput, setSelectedOrbitCodesInput] = useState<string[]>([]);
+  const [selectedObjectTypesInput, setSelectedObjectTypesInput] = useState<
+    string[]
+  >([]);
+  const [selectedOrbitCodesInput, setSelectedOrbitCodesInput] = useState<
+    string[]
+  >([]);
 
   const [appliedFilterText, setAppliedFilterText] = useState("");
   const [selectedObjectTypes, setSelectedObjectTypes] = useState<string[]>([]);
   const [selectedOrbitCodes, setSelectedOrbitCodes] = useState<string[]>([]);
 
   const orbitCodes = [
-    "{LEO}","{LEO1}","{LEO2}","{LEO3}","{LEO4}","{MEO}",
-    "{GEO}","{HEO}","{IGO}","{EGO}","{NSO}","{GTO}","{GHO}",
-    "{HAO}","{MGO}","{LMO}","{UFO}","{ESO}","UNKNOWN",
+    "{LEO}",
+    "{LEO1}",
+    "{LEO2}",
+    "{LEO3}",
+    "{LEO4}",
+    "{MEO}",
+    "{GEO}",
+    "{HEO}",
+    "{IGO}",
+    "{EGO}",
+    "{NSO}",
+    "{GTO}",
+    "{GHO}",
+    "{HAO}",
+    "{MGO}",
+    "{LMO}",
+    "{UFO}",
+    "{ESO}",
+    "UNKNOWN",
   ]; 
+  const applyFilters = () => {
+    setAppliedFilterText(filterTextInput); 
+    if (filterTextInput.trim() === "") {
+      setAppliedFilterText("");
+    }
+  };
+
+  useEffect(() => {
+    if (filterTextInput.trim() === "") {
+      setAppliedFilterText("");
+    }
+  }, [filterTextInput]); 
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      applyFilters();
+    }
+  }; 
+  useEffect(() => {
+    setSelectedObjectTypes(selectedObjectTypesInput);
+  }, [selectedObjectTypesInput]); 
+  useEffect(() => {
+    setSelectedOrbitCodes(selectedOrbitCodesInput);
+  }, [selectedOrbitCodesInput]);
+
   const fetchData = async () => {
     try {
       setIsLoading(true);
@@ -66,7 +109,7 @@ export const Home = () => {
       console.log("Raw API data:", data);
 
       if (data?.data) {
-        setData(data.data); 
+        setData(data.data);
         const uniqueObjectTypes = Array.from(
           new Set(data.data.map((item: Data) => item.objectType))
         ).filter(Boolean) as string[];
@@ -82,17 +125,13 @@ export const Home = () => {
     } finally {
       setIsLoading(false);
     }
-  }; 
+  };
+
   useEffect(() => {
     if (getData.length === 0) {
       fetchData();
     }
-  }, []); 
-  useEffect(() => {
-    setAppliedFilterText(filterTextInput);
-    setSelectedObjectTypes(selectedObjectTypesInput);
-    setSelectedOrbitCodes(selectedOrbitCodesInput);
-  }, [filterTextInput, selectedObjectTypesInput, selectedOrbitCodesInput]);
+  }, []);
 
   const filteredAssets = getData.filter((item) => {
     const matchesText =
@@ -123,10 +162,10 @@ export const Home = () => {
       setRowSelection(newSelection);
       setShowLimitError(false);
     } else {
-      setShowLimitError(true) 
+      setShowLimitError(true);
     }
-    
-  }; 
+  };
+
   const selectedAssest = () => {
     const selectedItems = Object.keys(rowSelection)
       .filter((id) => rowSelection[id])
@@ -173,7 +212,8 @@ export const Home = () => {
           <button
             onClick={selectedAssest}
             className="text-xl font-bold text-gray-800 mb-6 border rounded-sm px-2 bg-blue-500 text-white cursor-pointer"
-            disabled={Object.keys(rowSelection).length === 0}>
+            disabled={Object.keys(rowSelection).length === 0}
+          >
             Selected Data ({Object.keys(rowSelection).length})
           </button>
         </div>
@@ -200,9 +240,11 @@ export const Home = () => {
                   <TextField
                     fullWidth
                     size="small"
-                    placeholder="Filter by name or NORAD Cat ID"
+                    placeholder="Filter by name or NORAD Cat ID (Press Enter to apply)"
                     value={filterTextInput}
                     onChange={(e) => setFilterTextInput(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    onBlur={applyFilters}  
                     variant="outlined"
                     className="bg-gray-50"
                   />
@@ -228,18 +270,29 @@ export const Home = () => {
                 </div>
 
                 <div className="w-full md:w-64">
-                  <Autocomplete  multiple  size="small"  options={orbitCodes}  value={selectedOrbitCodesInput}  onChange={(e, v) => setSelectedOrbitCodesInput(v)}
-                    renderInput={(params) => (  <TextField {...params}  label="Orbit Code"  variant="outlined" />
+                  <Autocomplete
+                    multiple
+                    size="small"
+                    options={orbitCodes}
+                    value={selectedOrbitCodesInput}
+                    onChange={(e, v) => setSelectedOrbitCodesInput(v)}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Orbit Code"
+                        variant="outlined"
+                      />
                     )}
                     disableCloseOnSelect
                     filterSelectedOptions
                   />
-                </div> 
+                </div>
                 <Badge
                   badgeContent={activeFilterCount}
                   color="primary"
                   invisible={activeFilterCount === 0}
                   className="transform hover:scale-110 transition-transform"
+                  onClick={applyFilters}
                 >
                   <FilterListAltIcon
                     fontSize="medium"
@@ -288,7 +341,11 @@ export const Home = () => {
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.3 }}
                 >
-                   <AssetTable data={getData} rowSelection={rowSelection} onRowSelectionChange={setRowSelection}/>
+                  <AssetTable
+                    data={filteredAssets}
+                    rowSelection={rowSelection}
+                    onRowSelectionChange={handleRowSelectionChange}
+                  />
                 </motion.div>
               )}
             </div>
